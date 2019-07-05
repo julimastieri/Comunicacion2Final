@@ -13,6 +13,13 @@ public class Link {
 		this.r2 = r2;
 	}
 	
+	public Link (Link l) {
+		id=l.getId();
+		costo=l.getCosto();
+		r1=l.getR1();
+		r2=l.getR2();
+	}
+	
 	public int getId() {
 		return this.id;
 	}

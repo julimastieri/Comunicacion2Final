@@ -1,5 +1,6 @@
 package distanceVector;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -19,8 +20,20 @@ public class Router {
 		return this.id;
 	}
 	
-	public void agregarAdyacente (Router r, Link l) {
-		adyacentes.put(r,l);
+	public void agregarAdyacente (ArrayList<Link> links) {
+		Link laux;
+		int id1;
+		int id2;
+		for(int i=0; i<links.size(); i++) {
+			  laux = new Link (links.get(i));
+			  id1 = laux.getR1().getId();
+			  id2 = laux.getR2().getId();
+			  if (id == id1) {
+				  adyacentes.put(laux.getR2(), laux);
+			  } else if (id == id2) {
+				  		adyacentes.put(laux.getR1(), laux);
+			  		}
+		}
 	}
 	
 	public boolean addRuta(String red, Link link, int costo) {
@@ -44,7 +57,6 @@ public class Router {
 		
 		
 	}
-	
 	
 	public void intercambiarRutas() {
 		
