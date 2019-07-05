@@ -25,6 +25,16 @@ public class main {
 		Link l3 = new Link(3,1,r2,r4);
 		Link l4 = new Link(4,1,r3,r4);
 		
+		//agrego los adyacentes
+		r1.agregarAdyacente (r2, l1);
+		r1.agregarAdyacente (r3, l2);
+		r2.agregarAdyacente (r1, l1);
+		r2.agregarAdyacente (r4, l3);
+		r3.agregarAdyacente (r1, l2);
+		r3.agregarAdyacente (r4, l4);
+		r4.agregarAdyacente (r2, l3);
+		r4.agregarAdyacente (r3, l4);
+		
 		
 		r1.addRuta("2001:100B::/64", l1, 1); //esto se hace cdo se quiere agregar una nueva ruta
 		r2.addRuta("2001:100A::/64", l1, 1);
@@ -36,6 +46,7 @@ public class main {
 		//falta hacer como hacen los routers para descubrrir nevas rutas
 		
 		//guardar si se quiere la topologia de la red creada
+		
 		
 		
 	}
