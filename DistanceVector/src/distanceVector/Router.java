@@ -9,7 +9,7 @@ public class Router {
 	
 	public Router (int id) {
 		this.id = id;
-		 tabla = new HashMap<String,CostoRuta>();
+		tabla = new HashMap<String,CostoRuta>();
 	}
 	
 	public boolean addRuta(String red, Link link, int costo) {
@@ -21,10 +21,10 @@ public class Router {
 		}
 		else {
 			CostoRuta cr = new CostoRuta(link, link.getCosto() + costo);
-			int id1 = cr.link.getR1().getId();
-			int id2 = cr.link.getR2().getId();
+			int id1 = link.getR1().getId();
+			int id2 = link.getR2().getId();
 			
-			if ( (id == id1) || (id == id2)) {
+			if ( (id == id1) || (id == id2)) { //si es adyacente
 				tabla.put(red, cr);
 				return true;
 			} else
