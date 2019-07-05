@@ -33,18 +33,11 @@ public class main {
 		crearLink(4,1,3,4);
 		
 		//agrego los adyacentes
-		Integer id;
 		Router r;
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
-			id = entry.getKey();
 			r = entry.getValue();
-			
-			router.recibirTabla(tabla, costolink);
+			r.agregarAdyacente(links);
 		}
-		r1.agregarAdyacente (links);
-		r2.agregarAdyacente (links);
-		r3.agregarAdyacente (links);
-		r4.agregarAdyacente (links);
 		
 		while (!stop){
 			//recorrer lista routers for ()
