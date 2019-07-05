@@ -10,6 +10,7 @@ public class main {
 	static ArrayList<Link> links = new ArrayList<Link>();
 	static HashMap<Integer,Router> routers = new HashMap<Integer,Router>();
 	static boolean stop = false;
+	static int tiempo=0;
 	
 	public static void main (String[] arg) {
 	
@@ -26,33 +27,39 @@ public class main {
 		crearRed(4, "2001:100D::/64");
 		
 		//conecto los routers
-		crearLink(1,1,1,2);
-		crearLink(1,1,1,2);
+		crearLink(1,2,1,2);
 		crearLink(2,1,1,3);
-		crearLink(3,1,2,4);
+		crearLink(3,4,2,4);
 		crearLink(4,1,3,4);
 		
 		//agrego los adyacentes
 		Router r;
+		System.out.println("Tiempo: " + tiempo);
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
 			r = entry.getValue();
 			r.agregarAdyacente(links);
+			r.actualizarTabla();
+			r.imprimirTabla();
 		}
 		
-		while (!stop){
-			//recorrer lista routers for ()
+		System.out.println("\n \n");
+		
+		HashMap<String, CostoRuta> tablaIntercambio; 
+		while (tiempo < 150){
+			tiempo+=30;
+			System.out.println("Tiempo: " + tiempo);
+			for ( Entry<Integer, Router> entry : routers.entrySet() ){
+				r = entry.getValue();
+				r.intercambiarRutas();
+			}
+			
+			for ( Entry<Integer, Router> entry : routers.entrySet() ){
+				r = entry.getValue();
+				r.actualizarTabla();
+				r.imprimirTabla();
+			}
+			System.out.println("\n \n");
 		}
-		/*
-		r1.addRuta("2001:100B::/64", l1, 1); //esto se hace cdo se quiere agregar una nueva ruta
-		r2.addRuta("2001:100A::/64", l1, 1);
-		
-		r1.addRuta("2001:100C::/64", l2, 1);
-		r3.addRuta("2001:100A::/64", l2, 1);
-		*/
-		
-		
-		
-		//falta hacer como hacen los routers para descubrrir nevas rutas
 		
 		//guardar si se quiere la topologia de la red creada
 	}
@@ -73,4 +80,5 @@ public class main {
 		Router r = routers.get(idRouter);
 		r.addRuta(red, LOCAL, 0);
 	}
+
 }
