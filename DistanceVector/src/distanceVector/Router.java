@@ -75,7 +75,8 @@ public class Router {
 				int costoActual = tabla.get(red).getCosto();
 				
 				if (costoNuevo < costoActual) {
-					tabla.put(red, costoRuta); //actualizo el costo de la red
+					CostoRuta cR = new CostoRuta(costoRuta.getLink(),costoNuevo);
+					tabla.put(red, cR); //actualizo el costo de la red
 				}
 				
 			}else { //No tenia como llegar a esa red, la agrego
