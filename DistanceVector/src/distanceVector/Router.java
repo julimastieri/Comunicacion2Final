@@ -38,15 +38,15 @@ public class Router {
 		}
 	}
 	
-	public boolean addRuta(String red, Link link, int costo) {
+	public boolean addRuta(String red, Link link, int costoOriginal) {
 		
 		if (link.getId() == 0) { //LINK LOCAL
-			CostoRuta cr = new CostoRuta(link, link.getCosto() + costo);
+			CostoRuta cr = new CostoRuta(link, link.getCosto() + costoOriginal); //poner 0 directamente???
 			tablaNueva.put(red, cr);
 			return true;
 		}
 		else {
-			CostoRuta cr = new CostoRuta(link, link.getCosto() + costo);
+			CostoRuta cr = new CostoRuta(link, link.getCosto() + costoOriginal);
 			int id1 = link.getR1().getId();
 			int id2 = link.getR2().getId();
 			
@@ -61,29 +61,27 @@ public class Router {
 	public void intercambiarRutas() {
 		
 		Router router;
-		int costolink;
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
-			router = entry.getKey();
-			costolink = entry.getValue().getCosto();
-			
-			router.recibirTabla(tabla, costolink, adyacentes.get(router));
+			router = entry.getKey(); 
+		
+			router.recibirTabla(tabla, adyacentes.get(router));
 		}
 	}
 	
-	public void recibirTabla(HashMap<String, CostoRuta> tablaRecibida, int costolink, Link link) {
+	public void recibirTabla(HashMap<String, CostoRuta> tablaRecibida, Link link) {
 	
 		String red;
 		CostoRuta costoRuta;
 		
 		for ( Entry<String, CostoRuta> entry : tablaRecibida.entrySet() ){
 			
-			red = entry.getKey();
-			costoRuta = entry.getValue();
+			red = entry.getKey(); //LOCAL
+			costoRuta = entry.getValue(); 
 			
 			if(tablaNueva.containsKey(red)) { //Ya tengo la red, veo si me sirve
 				
-				int costoNuevo = costoRuta.getCosto() + costolink;
+				int costoNuevo = costoRuta.getCosto() + link.getCosto(); //costoRuta.getCosto = 0
 				int costoActual = tablaNueva.get(red).getCosto();
 				
 				if (costoNuevo < costoActual) {
@@ -92,7 +90,7 @@ public class Router {
 				}
 				
 			}else { //No tenia como llegar a esa red, la agrego
-				this.addRuta(red, link, costolink);
+				this.addRuta(red, link, costoRuta.getCosto());
 			}
 		}		
 	}	

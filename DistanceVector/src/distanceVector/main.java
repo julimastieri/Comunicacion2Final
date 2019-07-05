@@ -29,8 +29,8 @@ public class main {
 		//conecto los routers
 		crearLink(1,2,1,2);
 		crearLink(2,1,1,3);
-		crearLink(3,4,2,4);
-		crearLink(4,1,3,4);
+		crearLink(4,4,2,4);
+		crearLink(3,1,3,4);
 		
 		//agrego los adyacentes
 		Router r;
