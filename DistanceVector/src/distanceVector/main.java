@@ -27,10 +27,10 @@ public class main {
 		crearRed(4, "2001:100D::/64");
 		
 		//conecto los routers
-		crearLink(1,2,1,2);
-		crearLink(2,1,1,3);
-		crearLink(4,4,2,4);
-		crearLink(3,1,3,4);
+		crearLink(1,1,1,2);
+		crearLink(2,3,2,3);
+		crearLink(3,6,1,4);
+		crearLink(4,3,3,4);
 		
 		//agrego los adyacentes
 		Router r;
@@ -44,7 +44,7 @@ public class main {
 		
 		System.out.println("\n \n");
 		
-		HashMap<String, CostoRuta> tablaIntercambio; 
+		//HashMap<String, CostoRuta> tablaIntercambio; 
 		while (tiempo < 150){
 			tiempo+=30;
 			System.out.println("Tiempo: " + tiempo);
