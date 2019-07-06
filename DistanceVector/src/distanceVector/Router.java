@@ -5,21 +5,34 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class Router {
+	
+	static final int INFINITO = 88888; 
 
 	int id;
 	HashMap<String, CostoRuta> tabla; //tabla de ruteo que contiene los valores utilizados en el intercambio
 	HashMap<String, CostoRuta> tablaNueva;
 	HashMap<Router, Link> adyacentes;
+	HashMap<String,CostoRuta> tablaint;
 	
 	public Router (int id) {
 		this.id = id;
 		tabla = new HashMap<String,CostoRuta>();
 		tablaNueva = new HashMap<String,CostoRuta>();
 		adyacentes = new HashMap<Router,Link>();
+		
+		tablaint = new HashMap<String,CostoRuta>();
 	}
 	
 	public int getId() {
 		return this.id;
+	}
+	
+	public HashMap<String, CostoRuta> getTabla(){
+		return tabla;
+	}
+	
+	public HashMap<String, CostoRuta> getTablaTrigger(){
+		return tablaint;
 	}
 	
 	public void agregarAdyacente (ArrayList<Link> links) {
@@ -58,14 +71,17 @@ public class Router {
 		}
 	}
 	
-	public void intercambiarRutas() {
+	public void intercambiarRutas(HashMap<String,CostoRuta> tablaint) {
 		
 		Router router;
+		Link link;
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
 			router = entry.getKey(); 
-		
-			router.recibirTabla(tabla, adyacentes.get(router));
+			link = adyacentes.get(router);
+			
+			if (link.isActivo())
+				router.recibirTabla(tablaint, link);
 		}
 	}
 	
@@ -76,15 +92,16 @@ public class Router {
 		
 		for ( Entry<String, CostoRuta> entry : tablaRecibida.entrySet() ){
 			
-			red = entry.getKey(); //LOCAL
+			red = entry.getKey(); 
 			costoRuta = entry.getValue(); 
 			
 			if(tablaNueva.containsKey(red)) { //Ya tengo la red, veo si me sirve
 				
-				int costoNuevo = costoRuta.getCosto() + link.getCosto(); //costoRuta.getCosto = 0
+				int costoNuevo = costoRuta.getCosto() + link.getCosto(); 
 				int costoActual = tablaNueva.get(red).getCosto();
+				int idActual = tablaNueva.get(red).getLink().getId();
 				
-				if (costoNuevo < costoActual) {
+				if ((costoNuevo < costoActual) || ((costoNuevo > costoActual) && (link.getId() == idActual))) {
 					CostoRuta cR = new CostoRuta(link,costoNuevo);
 					tablaNueva.put(red, cR); //actualizo el costo de la red
 				}
@@ -111,5 +128,43 @@ public class Router {
 			System.out.printf("%-20s%-20s%-20s\n",red,cR.getLink().getId(),cR.getCosto());
 		}
 	}
+
+	public void chequearCaidaLink(int idLinkCaido) {
+		int idLink;
+		String red;
+		CostoRuta cRuta;
+		Link l;
+		
+		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){ //Tabla y TablaNueva son iguales en este momento?
+			l = entry.getValue().getLink();
+			idLink = l.getId(); 
+			
+			if (idLink == idLinkCaido) {
+				red = entry.getKey();
+				cRuta = new CostoRuta(l, INFINITO);
+				tablaNueva.put(red, cRuta); 
+				tablaint.put(red, cRuta); //tabla auxiliar con las lineas que cambiaron solamente
+			} 
+		}
+		
+		Router r;
+		
+		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){ 
+			r = entry.getKey();
+			l = entry.getValue();
+			idLink = l.getId();
+			
+			if(idLink == idLinkCaido) {
+				l.deshabilitarLink();
+				adyacentes.put(r,l);
+			}
+		}
+		
+	}
+	
+
+
+	
+	
 	
 }
