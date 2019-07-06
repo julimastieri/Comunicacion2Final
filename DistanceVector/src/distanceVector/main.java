@@ -55,21 +55,15 @@ public class main {
 				System.out.println("CAE EL LINK: ");
 				links.get(0).deshabilitarLink(); //cae el link 1. pos (id-1) en la lista
 				
-			
+				
 				for ( Entry<Integer, Router> entry : routers.entrySet() ){
 					r = entry.getValue();
 					r.chequearCaidaLink(1); //le mando el id del link q se cayo
-					r.actualizarTabla();
 				}
-				/*
-				 * hice dos veces el mismo for porque en uno se dan cuenta que se cayó el link
-				 * y en el otro se hace el intercambio del trigger update
-				 */
 				
 				//trigger update
 				for ( Entry<Integer, Router> entry : routers.entrySet() ){
 					r = entry.getValue();
-					r.intercambiarRutas(r.getTablaTrigger());
 					r.actualizarTabla();
 					r.imprimirTabla();
 				}

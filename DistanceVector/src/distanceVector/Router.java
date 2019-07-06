@@ -12,15 +12,13 @@ public class Router {
 	HashMap<String, CostoRuta> tabla; //tabla de ruteo que contiene los valores utilizados en el intercambio
 	HashMap<String, CostoRuta> tablaNueva;
 	HashMap<Router, Link> adyacentes;
-	HashMap<String,CostoRuta> tablaint;
 	
 	public Router (int id) {
 		this.id = id;
 		tabla = new HashMap<String,CostoRuta>();
 		tablaNueva = new HashMap<String,CostoRuta>();
 		adyacentes = new HashMap<Router,Link>();
-		
-		tablaint = new HashMap<String,CostoRuta>();
+
 	}
 	
 	public int getId() {
@@ -31,9 +29,6 @@ public class Router {
 		return tabla;
 	}
 	
-	public HashMap<String, CostoRuta> getTablaTrigger(){
-		return tablaint;
-	}
 	
 	public void agregarAdyacente (ArrayList<Link> links) {
 		Link laux;
@@ -54,7 +49,7 @@ public class Router {
 	public boolean addRuta(String red, Link link, int costoOriginal) {
 		
 		if (link.getId() == 0) { //LINK LOCAL
-			CostoRuta cr = new CostoRuta(link, link.getCosto() + costoOriginal); //poner 0 directamente???
+			CostoRuta cr = new CostoRuta(link, 0); 
 			tablaNueva.put(red, cr);
 			return true;
 		}
@@ -134,6 +129,7 @@ public class Router {
 		String red;
 		CostoRuta cRuta;
 		Link l;
+		HashMap<String,CostoRuta> tablaint = new HashMap<String,CostoRuta>();
 		
 		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){ //Tabla y TablaNueva son iguales en este momento?
 			l = entry.getValue().getLink();
@@ -159,6 +155,8 @@ public class Router {
 				adyacentes.put(r,l);
 			}
 		}
+		
+		intercambiarRutas(tablaint);
 		
 	}
 	
