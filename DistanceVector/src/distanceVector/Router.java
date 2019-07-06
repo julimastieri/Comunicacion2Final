@@ -9,7 +9,7 @@ public class Router {
 	static final int INFINITO = 88888; 
 
 	int id;
-	HashMap<String, CostoRuta> tabla; //tabla de ruteo que contiene los valores utilizados en el intercambio
+	HashMap<String, CostoRuta> tabla;//tabla de ruteo que contiene los valores utilizados en el intercambio
 	HashMap<String, CostoRuta> tablaNueva;
 	HashMap<Router, Link> adyacentes;
 	
@@ -114,15 +114,35 @@ public class Router {
 	public void imprimirTabla() {
 		String red;
 		CostoRuta cR;
+		String costo;
+		String link;
+		
 		System.out.println("\n");
 		System.out.println("Tabla del Router "+id);
 		System.out.printf("%-20s%-20s%-20s\n","Red","Link","Costo");
 		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){
 			red = entry.getKey();
 			cR = entry.getValue();
-			System.out.printf("%-20s%-20s%-20s\n",red,cR.getLink().getId(),cR.getCosto());
+			
+			if (cR.getCosto() < INFINITO) {
+				costo="";
+				costo += cR.getCosto();
+			}
+			else 
+				costo = "Infinito";
+			
+				
+			if (cR.getLink().getId() != 0) {
+				link="";
+				link+=cR.getLink().getId();
+			}
+			else
+				link= "Local";
+			
+			System.out.printf("%-20s%-20s%-20s\n",red,link,costo);
+
+			}
 		}
-	}
 
 	public void chequearCaidaLink(int idLinkCaido) {
 		int idLink;
@@ -159,10 +179,20 @@ public class Router {
 		intercambiarRutas(tablaint);
 		
 	}
-	
 
+	public String getRedesLocales() {
+		StringBuilder redesLoc = new StringBuilder();
+		
+		String red;
+		CostoRuta cR;
+		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){
+			if  (entry.getValue().getCosto() == 0) {
+				red = entry.getKey();
+				redesLoc.append(this.id + "\n");
+				redesLoc.append(red+"\n");
+			}
+		}
+		return redesLoc.toString();
+	}
 
-	
-	
-	
 }
