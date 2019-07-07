@@ -256,7 +256,8 @@ public class main {
 				r = entry.getValue();
 				c = r.actualizarTabla();
 				r.imprimirTabla();
-				if (!c) { converge = false;}
+				if (!c) {
+					converge = false;}
 			}
 			System.out.println("\n \n");
 		}
