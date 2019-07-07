@@ -94,9 +94,11 @@ public class main {
 				try {cargarTopologia();
 				}catch (IOException e) { e.printStackTrace();}
 				
-			}else if (eleccion == 3) {
+			}else if (eleccion == 3) {	
+				agregarAdyacentes();
+				System.out.println("\n \n");
 				tiempoConverge = calcularConvergencia(-1,-1);
-				System.out.println("Converge a los "+ tiempoConverge+ "segundos.");
+				System.out.println("Converge a los "+ tiempoConverge+ " segundos.");
 				
 			}else if (eleccion == 4) {
 				
@@ -104,8 +106,13 @@ public class main {
 				id = reader.nextInt();
 				System.out.println("Ingrese el tiempo en el que se cae el link: " + "\n");
 				tiempoCaida = reader.nextInt();
+				if (tiempo != 0) {
+					tiempo-=30;//arranca desde el t que convergió
+				}else { 
+					agregarAdyacentes(); //arranca desde 0
+				}
 				tiempoConverge = calcularConvergencia(id, tiempoCaida);
-				System.out.println("Converge a los "+ tiempoConverge+ "segundos.");
+				System.out.println("Converge a los "+ tiempoConverge+ " segundos.");
 				
 			}else if (eleccion == 5){
 				try {guardarTopologia();}
@@ -114,6 +121,18 @@ public class main {
 		}
 		System.out.println("Programa finalizado.");
 		
+	}
+	
+	private static void agregarAdyacentes() {
+		Router r;
+		System.out.println("Tiempo: " + tiempo);
+		for ( Entry<Integer, Router> entry : routers.entrySet() ){
+			r = entry.getValue();
+			r.agregarAdyacente(links);
+			r.actualizarTabla();
+			r.imprimirTabla(); //tiempo 0
+		}
+		tiempo+=30; //arranca desde el t 30
 	}
 	
 	private static void ingresarTopologia() {
@@ -193,11 +212,11 @@ public class main {
 		
 	}
 	
-	private static void caidaLink(int idLink) {
+	private static void caidaLink(int idLink, int tiempoCaida) {
 		Router r;
 		
 		System.out.println("Cae el link: " + idLink + "\n");
-		
+		System.out.println("Tiempo: "+ tiempoCaida);
 		links.get(idLink-1).deshabilitarLink(); //cae el link 1. pos (id-1) en la lista
 		
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
@@ -219,30 +238,10 @@ public class main {
 		boolean converge = false;
 		boolean c;
 		
-		//agrego los adyacentes
-
-		System.out.println("Tiempo: " + tiempo);
-		for ( Entry<Integer, Router> entry : routers.entrySet() ){
-			r = entry.getValue();
-			r.agregarAdyacente(links);
-			r.actualizarTabla();
-			r.imprimirTabla(); //tiempo 0
-		}
-				
-		System.out.println("\n \n");
 		
-		
-		while (!converge){ //converge en t = 90
+		while (!converge){ 
 			
-			tiempo+=30;
 			System.out.println("Tiempo: " + tiempo);
-			
-			
-			//Caida de un link  
-			if ((tiempo < tiempoCaida) && (tiempoCaida < tiempo+30)) {
-				caidaLink(idLink);	
-			}
-			
 			
 			//intercambio correspondiente a los 30 segundos
 			
@@ -260,11 +259,22 @@ public class main {
 					converge = false;}
 			}
 			System.out.println("\n \n");
+			
+			
+			//Caida de un link  
+			if ((tiempo < tiempoCaida) && (tiempoCaida < tiempo+30)) {
+				caidaLink(idLink, tiempoCaida);
+				converge = false; //para que haga el siguiente intercambio
+				System.out.println("\n");
+			}
+			
+			tiempo+=30;	
 		}
 		
-		return tiempo;
+		return tiempo-30;
 	}
 	
+
 	
 	private static void crearRouter(int id) {
 		Router r = new Router(id);
