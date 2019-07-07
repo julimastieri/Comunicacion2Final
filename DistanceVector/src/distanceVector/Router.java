@@ -107,8 +107,10 @@ public class Router {
 		}		
 	}	
 			
-	public void actualizarTabla() {
+	public boolean actualizarTabla() {
+		
 		tabla = new HashMap<String,CostoRuta>(tablaNueva);
+		return tabla.equals(tablaNueva);
 	}
 	
 	public void imprimirTabla() {
