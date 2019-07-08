@@ -183,6 +183,19 @@ public class Router {
 		
 	}
 
+	public String mostrarRedesLocales() {
+		StringBuilder redesLoc = new StringBuilder();
+		
+		String red;
+		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){
+			if  (entry.getValue().getCosto() == 0) {
+				red = entry.getKey();
+				redesLoc.append("Router "+this.id + " conectado a la red: "+red+" por link local \n");
+			}
+		}
+		return redesLoc.toString();
+	}
+	
 	public String getRedesLocales() {
 		StringBuilder redesLoc = new StringBuilder();
 		
