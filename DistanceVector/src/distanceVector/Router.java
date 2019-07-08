@@ -3,6 +3,7 @@ package distanceVector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class Router {
 	
@@ -153,7 +154,7 @@ public class Router {
 		Link l;
 		HashMap<String,CostoRuta> tablaint = new HashMap<String,CostoRuta>();
 		
-		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){ //Tabla y TablaNueva son iguales en este momento?
+		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){
 			l = entry.getValue().getLink();
 			idLink = l.getId(); 
 			
@@ -186,7 +187,6 @@ public class Router {
 		StringBuilder redesLoc = new StringBuilder();
 		
 		String red;
-		CostoRuta cR;
 		for ( Entry<String, CostoRuta> entry : tablaNueva.entrySet() ){
 			if  (entry.getValue().getCosto() == 0) {
 				red = entry.getKey();
@@ -195,6 +195,16 @@ public class Router {
 			}
 		}
 		return redesLoc.toString();
+	}
+	
+	public void reset() {
+		
+		for ( Entry<String, CostoRuta> entry : tabla.entrySet() ){
+			if  (entry.getValue().getCosto() > 0)
+				tablaNueva.remove(entry.getKey());
+		}
+		tabla = new HashMap<String,CostoRuta>();
+		adyacentes = new HashMap<Router,Link>();
 	}
 
 }

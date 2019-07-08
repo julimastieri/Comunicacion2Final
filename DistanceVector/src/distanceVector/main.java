@@ -1,12 +1,13 @@
 package distanceVector;
 
-import java.awt.Menu;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -18,41 +19,30 @@ public class main {
 	static final Link LOCAL = new Link(0, 0, null, null);
 	static ArrayList<Link> links = new ArrayList<Link>();
 	static HashMap<Integer,Router> routers = new HashMap<Integer,Router>();
-	//static boolean stop = false;
 	static int tiempo=0;
+	static ArrayList<TiempoCaida> linksCaidos = new ArrayList<TiempoCaida>();
+	
+	//opcion que me permita ver la topologia de la red (redes q hay, links q hay routers q hay) y lista de los links caidos
+	
+	//chequear que a la hora de agregar un link o una red que los idRouter existan (tampoco dejar q haya dos routers con mismo id)
+	//y que tampoco se permita repetir id de links
+	
+	//no permitir crear link con id 0 pq eso significa local y el costo tiene que ser mayor a 0
+	//los routers de un link tienen q ser distintos (excepto si es el link 0) 
+	
+	//dar opcion de borrar la caida de un link
+	
+	//corregir q cdo no hay routers no anda
 	
 	public static void main (String[] arg) {
-		
-		menu();
-		
-		/*
-		//topologia de prefi 2018
-		crearRouter(1);
-		crearRouter(2);
-		crearRouter(3);
-		crearRouter(4);
-		
-		//CREO REDES
-		crearRed(1, "2001:100A::/64");
-		crearRed(2, "2001:100B::/64");
-		crearRed(3, "2001:100C::/64");
-		crearRed(4, "2001:100D::/64");
-		
-		//conecto los routers
-		crearLink(1,1,1,2);
-		crearLink(2,3,2,3);
-		crearLink(3,6,1,4);
-		crearLink(4,3,3,4);
-		
-		*/
-
-		 
+		menu();		 
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public static void menu () {
 		
-		//topologia de prefi 2018
+		/*/topologia de prefi 2018
 				crearRouter(1);
 				crearRouter(2);
 				crearRouter(3);
@@ -68,7 +58,7 @@ public class main {
 				crearLink(1,1,1,2);
 				crearLink(2,3,2,3);
 				crearLink(3,6,1,4);
-				crearLink(4,3,3,4);
+				crearLink(4,3,3,4);*/
 				
 		
 		int eleccion = 0;
@@ -83,7 +73,7 @@ public class main {
 			
 			Scanner reader = new Scanner(System.in);
 			eleccion = reader.nextInt();
-			int id, tiempoCaida;
+			
 			int tiempoConverge;
 			
 			if (eleccion == 1) {
@@ -97,22 +87,52 @@ public class main {
 			}else if (eleccion == 3) {	
 				agregarAdyacentes();
 				System.out.println("\n \n");
-				tiempoConverge = calcularConvergencia(-1,-1);
-				System.out.println("Converge a los "+ tiempoConverge+ " segundos.");
+				tiempoConverge = calcularConvergencia();
+				System.out.println("Converge a los "+ tiempoConverge+ " segundos.\n");
 				
-			}else if (eleccion == 4) {
+			}else if ( (eleccion == 4)){
 				
-				System.out.println("Ingrese el id del link que se cae:" + " \n");
-				id = reader.nextInt();
-				System.out.println("Ingrese el tiempo en el que se cae el link: " + "\n");
-				tiempoCaida = reader.nextInt();
-				if (tiempo != 0) {
-					tiempo-=30;//arranca desde el t que convergió
-				}else { 
-					agregarAdyacentes(); //arranca desde 0
+				if (!(links.isEmpty())) {
+					int id, tiempoCaida;
+					eleccion = 1;
+					TiempoCaida tC;
+					ComparadorArrayList comparador = new ComparadorArrayList();
+					
+					//cargo todos los links que quiero que se caigan
+					while (eleccion == 1) {
+						
+						//pido link
+						listarLinks(); //listo links en pantalla
+						System.out.println("Ingrese el id del link que se cae:");
+						id = reader.nextInt();
+						while ( !(existeLink(id)) ){
+							System.out.println("Link inexistente, ingrese link valido");
+							listarLinks();
+							id = reader.nextInt();
+						}
+						
+						//pido tiempo
+						System.out.println("Ingrese el tiempo en el que se cae el link: ");
+						tiempoCaida = reader.nextInt();
+						while (tiempoCaida<0) {
+							System.out.println("Tiempo invalido, ingrese tiempo positivo: ");
+							tiempoCaida=reader.nextInt();
+						}
+						
+						//agrego link
+						tC = new TiempoCaida(tiempoCaida, id);
+						linksCaidos.add(tC);
+						
+						System.out.println("1. Ingresar otra caida de link. ");
+						System.out.println("2. Terminar. \n");
+						eleccion = reader.nextInt();
+					}
+					
+					//ordeno por tiempo la lista (de menor a mayor)
+					Collections.sort(linksCaidos, comparador);
 				}
-				tiempoConverge = calcularConvergencia(id, tiempoCaida);
-				System.out.println("Converge a los "+ tiempoConverge+ " segundos.");
+				else
+					System.out.println("No hay links en la topologia.\n ");
 				
 			}else if (eleccion == 5){
 				try {guardarTopologia();}
@@ -123,16 +143,33 @@ public class main {
 		
 	}
 	
+	private static boolean existeLink(int idLink) {
+		int i=0;
+		int idAct;
+		
+		while ( i<links.size() )  {
+			idAct = links.get(i).getId();
+			i++;
+			if (idAct == idLink)
+				return true;
+		}
+		return false;
+	}
+	
+	private static void listarLinks() {
+		System.out.print("Lista de Links: ");
+		for (int i = 0; i < links.size(); i++) {
+			System.out.print(links.get(i).getId()+ " ");
+		}
+		System.out.println("");
+	}
+	
 	private static void agregarAdyacentes() {
 		Router r;
-		System.out.println("Tiempo: " + tiempo);
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
 			r = entry.getValue();
 			r.agregarAdyacente(links);
-			r.actualizarTabla();
-			r.imprimirTabla(); //tiempo 0
 		}
-		tiempo+=30; //arranca desde el t 30
 	}
 	
 	private static void ingresarTopologia() {
@@ -151,8 +188,6 @@ public class main {
 			String red;
 			Scanner reader = new Scanner(System.in);
 			Scanner reader2 = new Scanner(System.in);
-			Scanner reader3 = new Scanner(System.in);
-			Scanner reader4 = new Scanner(System.in);
 			eleccion = reader.nextInt();
 			int seguir = 1;
 			
@@ -165,7 +200,7 @@ public class main {
 					crearRouter(id);
 					System.out.println("Router " + id +" creado correctamente." + "\n");
 					System.out.println("1. Ingresar otro router. ");
-					System.out.println("2. Volver al menu. ");
+					System.out.println("2. Volver al menu. \n");
 					seguir = reader.nextInt();
 				}
 				
@@ -175,36 +210,32 @@ public class main {
 					System.out.println("\n");
 					System.out.println("Ingrese el id del router:");
 					id = reader.nextInt();
-					System.out.println("\n");
 					System.out.println("Ingrese la red: ");
 					red = reader2.nextLine();
 					crearRed(id, red);
 					System.out.println("Red " + red +" creada correctamente." + "\n");
 					System.out.println("1. Ingresar otra red. " );
-					System.out.println("2. Volver al menu. " );
+					System.out.println("2. Volver al menu. \n" );
 					seguir = reader.nextInt();
 				}	
 			}else if (eleccion == 3){
 				
 				seguir = 1;
 				while (seguir == 1) {
-					System.out.println("\n");
-					System.out.println("Ingrese el numero del link: ");
+					
+					System.out.println("\nIngrese el numero del link: ");
 					id = reader.nextInt();
-					System.out.println("\n");
 					System.out.println("Ingrese el costo del link: " );
-					costo = reader2.nextInt();
-					System.out.println("\n");
+					costo = reader.nextInt();
 					System.out.println("Ingrese el id de uno de los routers de los extremos: " );
-					id1 = reader3.nextInt();
-					System.out.println("\n");
+					id1 = reader.nextInt();
 					System.out.println("Ingrese el id del router del otro extremo: ");
-					id2 = reader4.nextInt();
+					id2 = reader.nextInt();
 					crearLink(id, costo, id1, id2);
 					
 					System.out.println("Link " + id +" creado correctamente." + "\n");
 					System.out.println("1. Ingresar otro link. ");
-					System.out.println("2. Volver al menu. ");
+					System.out.println("2. Volver al menu. \n");
 					seguir = reader.nextInt();
 				}	
 			}
@@ -215,63 +246,102 @@ public class main {
 	private static void caidaLink(int idLink, int tiempoCaida) {
 		Router r;
 		
-		System.out.println("Cae el link: " + idLink + "\n");
-		System.out.println("Tiempo: "+ tiempoCaida);
-		links.get(idLink-1).deshabilitarLink(); //cae el link 1. pos (id-1) en la lista
+		System.out.println("Cae el link: " + idLink + " en el tiempo " + tiempoCaida +"\n");
+		links.get(getPosLink(idLink)).deshabilitarLink(); //se desabilita el link con id dado en la lista de links
 		
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
 			r = entry.getValue();
-			r.chequearCaidaLink(idLink); //le mando el id del link q se cayo
+			//le mando el id del link para actualizar los costos a inf y realizar un intercambio correspondiente al trigger update
+			r.chequearCaidaLink(idLink); 
 		}
 		
-		//trigger update
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
 			r = entry.getValue();
 			r.actualizarTabla();
 			r.imprimirTabla();
 		}
+		System.out.println("\n");
 	}
 	
-	public static int calcularConvergencia(int idLink, int tiempoCaida) {
+	private static int getPosLink(int idLink) {
+		int i=0;
+		int idAct;
+		
+		while ( i<links.size() )  {
+			idAct = links.get(i).getId();
+			if (idAct == idLink)
+				return i;
+			i++;
+		}
+		return -1;
+	}
+	
+	public static int calcularConvergencia() {
 		
 		Router r;
 		boolean converge = false;
-		boolean c;
+		int i=0;
+		int tCaida = tiempo;
+		boolean caido;
 		
+		/*/imprimo lista de links caidos
+		Link laux;
+		for (int j = 0; j < linksCaidos.size(); j++) {
+			System.out.println("Link: " +  linksCaidos.get(j).getIdLinkCaido() + " con tiempo: " +linksCaidos.get(j).getTiempo());
+		}*/
 		
-		while (!converge){ 
-			
+		while (!converge){
 			System.out.println("Tiempo: " + tiempo);
+			caido = false;
+		
+			//caida links con tCaida=tiempo
+			while ( (tCaida == tiempo) && (i < linksCaidos.size()) ) {
+				tCaida = linksCaidos.get(i).getTiempo();
+				if (tCaida == tiempo) {
+					caidaLink(linksCaidos.get(i).getIdLinkCaido(), tCaida);
+					i++;
+					caido = true;
+				}
+			}
 			
 			//intercambio correspondiente a los 30 segundos
 			
-			for ( Entry<Integer, Router> entry : routers.entrySet() ){
-				r = entry.getValue();
-				r.intercambiarRutas(r.getTabla());
+			if ((tiempo != 0) && (!caido))
+				for ( Entry<Integer, Router> entry : routers.entrySet() ){
+					r = entry.getValue();
+					r.intercambiarRutas(r.getTabla());
+				}
+			
+			if (!caido) {
+				for ( Entry<Integer, Router> entry : routers.entrySet() ){
+					r = entry.getValue();
+					converge = r.actualizarTabla();
+					r.imprimirTabla();
+				}
+				System.out.println("\n \n");
 			}
 			
-			converge = true;
-			for ( Entry<Integer, Router> entry : routers.entrySet() ){
-				r = entry.getValue();
-				c = r.actualizarTabla();
-				r.imprimirTabla();
-				if (!c) {
-					converge = false;}
-			}
-			System.out.println("\n \n");
-			
-			
-			//Caida de un link  
-			if ((tiempo < tiempoCaida) && (tiempoCaida < tiempo+30)) {
-				caidaLink(idLink, tiempoCaida);
-				converge = false; //para que haga el siguiente intercambio
-				System.out.println("\n");
+			//Caida de un link (veo si corresponde que se caiga un link)
+			while ( (tiempo < tCaida) && (tCaida < tiempo+30) && (i < linksCaidos.size()) ) {
+				tCaida = linksCaidos.get(i).getTiempo();
+				if ( (tiempo < tCaida) && (tCaida < tiempo+30) ) {
+					caidaLink(linksCaidos.get(i).getIdLinkCaido(), tCaida);
+					converge = false;
+					i++;
+				}
 			}
 			
 			tiempo+=30;	
 		}
-		
-		return tiempo-30;
+		int tiempoConvergencia=tiempo-30;
+		//reseteo estructuras por si se vuelve a usar 
+		tiempo = 0;
+		//resetear roouters
+		for ( Entry<Integer, Router> entry : routers.entrySet() ){
+			r = entry.getValue();
+			r.reset();
+		}
+		return tiempoConvergencia;
 	}
 	
 
