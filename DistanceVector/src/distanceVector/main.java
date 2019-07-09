@@ -214,8 +214,10 @@ public class main {
 						System.out.println("2. Volver al menu. \n" );
 						seguir = reader.nextInt();
 					}
-					else
-						System.out.println("No hay routers cargados en la topologia, ingrese uno y reintente");
+					else {
+						System.out.println("No hay routers cargados en la topologia, ingrese uno y reintente \n");
+						seguir = 2;
+					}
 					
 				}	
 			}else if (eleccion == 3){
@@ -223,7 +225,7 @@ public class main {
 				seguir = 1;
 				while (seguir == 1) {
 					
-					if (routers.size()<2) {
+					if (routers.size()>1) {
 						listarLinks();
 						System.out.println("\nIngrese el numero del link: ");
 						id = reader.nextInt();
@@ -269,8 +271,10 @@ public class main {
 						System.out.println("2. Volver al menu. \n");
 						seguir = reader.nextInt();
 					}
-					else
-						System.out.println("La cantidad de routers exisentes es menor a dos, agregue los necesarios y reintente");
+					else {
+						System.out.println("La cantidad de routers exisentes es menor a dos, agregue los necesarios y reintente \n");
+						seguir = 2;
+					}
 				}	
 			}
 		}
