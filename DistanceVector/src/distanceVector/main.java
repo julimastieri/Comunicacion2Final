@@ -360,6 +360,7 @@ public class main {
 		int i=0;
 		int tCaida = tiempo;
 		boolean caido;
+		boolean c;
 		
 		while  ( (!converge) || (i<linksCaidos.size()) ){
 			System.out.println("Tiempo: " + tiempo);
@@ -384,11 +385,15 @@ public class main {
 					r.intercambiarRutas(r.getTabla());
 				}
 			
+			
 			if (!caido) {
+				converge = true; 
 				for ( Entry<Integer, Router> entry : routers.entrySet() ){
 					r = entry.getValue();
-					converge = r.actualizarTabla();
+					c = r.actualizarTabla();
 					r.imprimirTabla();
+					if (!c)
+						converge = c;
 				}
 				System.out.println("\n");
 			}
