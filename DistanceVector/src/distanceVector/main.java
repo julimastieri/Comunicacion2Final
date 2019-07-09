@@ -24,24 +24,6 @@ public class main {
 	
 	public static void main (String[] arg) {
 		
-		//topologia de parcial 2017
-		crearRouter(1);
-		crearRouter(2);
-		crearRouter(3);
-		//crearRouter(4);
-		
-		//CREO REDES
-		crearRed(1, "2001:100A::/64");
-		crearRed(2, "2001:100B::/64");
-		crearRed(3, "2001:100C::/64");
-		//crearRed(4, "2001:100D::/64");
-		
-		//conecto los routers
-		crearLink(1,2,3,2);
-		crearLink(2,1,2,1);
-		crearLink(3,5,1,3);
-		//crearLink(4,3,3,4);
-		
 		int eleccion = 0;
 		while (eleccion != 7) {
 			System.out.println("Algoritmo Distance Vector");
