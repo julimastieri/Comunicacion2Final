@@ -24,12 +24,30 @@ public class main {
 	
 	public static void main (String[] arg) {
 		
+		//topologia de prefi 2018
+		crearRouter(1);
+		crearRouter(2);
+		crearRouter(3);
+		crearRouter(4);
+		
+		//CREO REDES
+		crearRed(1, "2001:100A::/64");
+		crearRed(2, "2001:100B::/64");
+		crearRed(3, "2001:100C::/64");
+		crearRed(4, "2001:100D::/64");
+		
+		//conecto los routers
+		crearLink(1,1,1,2);
+		crearLink(2,3,2,3);
+		crearLink(3,6,1,4);
+		crearLink(4,3,3,4);
+		
 		int eleccion = 0;
 		while (eleccion != 7) {
 			System.out.println("Algoritmo Distance Vector");
 			System.out.println("1- Ingresar topologia. ");
 			System.out.println("2- Cargar topologia guardada. ");
-			System.out.println("3- Mostrar tablas hasta que converjan. ");
+			System.out.println("3- Mostrar tablas hasta que converge. ");
 			System.out.println("4- Agregar caida de un link.");
 			System.out.println("5- Guardar topologia. ");
 			System.out.println("6- Mostrar topologia. ");
@@ -393,7 +411,7 @@ public class main {
 					c = r.actualizarTabla();
 					r.imprimirTabla();
 					if (!c)
-						converge = c;
+						converge = false;
 				}
 				System.out.println("\n");
 			}
