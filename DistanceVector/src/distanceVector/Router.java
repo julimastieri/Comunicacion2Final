@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Router {
 	
-	static final int INFINITO = 88888; 
+	static final int INFINITO = 8; 
 
 	int id;
 	HashMap<String, CostoRuta> tabla;//tabla de ruteo que contiene los valores utilizados en el intercambio
@@ -69,15 +69,47 @@ public class Router {
 	
 	public void intercambiarRutas(HashMap<String,CostoRuta> tablaint) {
 		
-		Router router;
-		Link link;
+		Router routerAdy;
+		Link linkAdy, linkTabla;
+		CostoRuta cR;
+		String red;
+		String costo, linkStr;
+		
+		HashMap<String, CostoRuta> tablaAux = new HashMap<String, CostoRuta>(tablaint);
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
-			router = entry.getKey(); 
-			link = adyacentes.get(router);
+			routerAdy = entry.getKey(); 
+			linkAdy = adyacentes.get(routerAdy);
 			
-			if (link.isActivo())
-				router.recibirTabla(tablaint, link);
+			 for ( Entry<String,CostoRuta> entry2 : tablaint.entrySet() ){
+				
+				linkTabla = entry2.getValue().getLink();
+				/*si el link que me conecta con el router adyacente 
+				es el que uso para llegar a una determinada red,
+				le debo mandar costo infinito*/
+				if (linkAdy.getId() == linkTabla.getId()) {
+					entry2.getValue().setCosto(INFINITO);
+				}
+			}
+		
+			//imprimo mensajes
+			System.out.print("Router "+id +"->Router "+routerAdy.getId()+"(L"+linkAdy.getId()+"): ");
+			for ( Entry<String,CostoRuta> entry3 : tablaint.entrySet() ){
+				red = entry3.getKey();
+				cR = entry3.getValue();
+				
+				if (cR.getCosto() < INFINITO) {
+					costo="";
+					costo += cR.getCosto();
+				}
+				else 
+					costo = "Infinito";
+
+				System.out.print("("+ red +", "+ costo +") ");
+			}
+			System.out.println();
+			if (linkAdy.isActivo())
+				routerAdy.recibirTabla(tablaint, linkAdy);
 		}
 	}
 	
@@ -161,7 +193,7 @@ public class Router {
 			if (idLink == idLinkCaido) {
 				red = entry.getKey();
 				cRuta = new CostoRuta(l, INFINITO);
-				tablaNueva.put(red, cRuta); 
+				tablaNueva.put(red, cRuta);
 				tablaint.put(red, cRuta); //tabla auxiliar con las lineas que cambiaron solamente
 			} 
 		}
@@ -175,6 +207,7 @@ public class Router {
 			
 			if(idLink == idLinkCaido) {
 				l.deshabilitarLink();
+				adyacentes.remove(r);
 				adyacentes.put(r,l);
 			}
 		}

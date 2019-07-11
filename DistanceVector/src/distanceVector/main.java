@@ -317,7 +317,7 @@ public class main {
 		
 		System.out.println("Lista de links caidos:");
 		for (int j = 0; j < linksCaidos.size(); j++) {
-			System.out.println("Link: " +  linksCaidos.get(j).getIdLinkCaido() + " con tiempo: " +linksCaidos.get(j).getTiempo());
+			System.out.println("Link " +  linksCaidos.get(j).getIdLinkCaido() + " se cae en el tiempo " +linksCaidos.get(j).getTiempo());
 		}
 		
 		if (linksCaidos.isEmpty())
@@ -417,7 +417,7 @@ public class main {
 		int tiempoConvergencia=tiempo-30;
 		//reseteo estructuras por si se vuelve a usar 
 		tiempo = 0;
-		//resetear roouters
+		//resetear routers
 		for ( Entry<Integer, Router> entry : routers.entrySet() ){
 			r = entry.getValue();
 			r.reset();

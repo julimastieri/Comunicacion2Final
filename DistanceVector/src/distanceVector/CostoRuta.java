@@ -16,4 +16,8 @@ public class CostoRuta {
 	public int getCosto() {
 		return this.costo;
 	}
+	
+	public void setCosto(int c) {
+		costo = c;
+	}
 }
