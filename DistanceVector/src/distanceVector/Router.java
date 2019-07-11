@@ -73,9 +73,7 @@ public class Router {
 		Link linkAdy, linkTabla;
 		CostoRuta cR;
 		String red;
-		String costo, linkStr;
-		
-		HashMap<String, CostoRuta> tablaAux = new HashMap<String, CostoRuta>(tablaint);
+		String costo;
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
 			routerAdy = entry.getKey(); 
