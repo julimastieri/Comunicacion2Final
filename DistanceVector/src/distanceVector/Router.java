@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Router {
 	
-	static final int INFINITO = 88; 
+	static final int INFINITO = 16; 
 
 	int id;
 	HashMap<String, CostoRuta> tabla;//tabla de ruteo que contiene los valores utilizados en el intercambio
@@ -70,54 +70,17 @@ public class Router {
 	public void intercambiarRutas(HashMap<String,CostoRuta> tablaint) {
 		
 		Router routerAdy;
-		Link linkAdy, linkTabla;
-		CostoRuta cR;
-		String red;
-		String costo;
-		HashMap<String,CostoRuta> tablaAux = new HashMap<String,CostoRuta>();
+		Link linkAdy;
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
 			routerAdy = entry.getKey(); 
 			linkAdy = entry.getValue();
 			
-			//copio contenido de la tabla de intercambio para poder modificarlo acorde a 
-			for ( Entry<String,CostoRuta> entry4 : tablaint.entrySet() ){
-				red = entry4.getKey();
-				linkTabla = new Link(entry4.getValue().getLink());
-				cR = new CostoRuta(linkTabla, entry4.getValue().getCosto());
-				tablaAux.put(red, cR);
-			}
 			
-			for ( Entry<String,CostoRuta> entry2 : tablaAux.entrySet() ){
-				
-				linkTabla = entry2.getValue().getLink();
-				/*si el link que me conecta con el router adyacente 
-				es el que uso para llegar a una determinada red,
-				le debo mandar costo infinito*/
-				if (linkAdy.getId() == linkTabla.getId()) {
-					entry2.getValue().setCosto(INFINITO);
-				}
+			if ( (linkAdy.isActivo()) && (!(tablaint.isEmpty())) ) {
+				System.out.print("Router "+id +"->Router "+routerAdy.getId()+"(L"+linkAdy.getId()+"): ");
+				routerAdy.recibirTabla(tablaint, linkAdy);
 			}
-		
-			//imprimo mensajes
-			System.out.print("Router "+id +"->Router "+routerAdy.getId()+"(L"+linkAdy.getId()+"): ");
-			for ( Entry<String,CostoRuta> entry3 : tablaAux.entrySet() ){
-				red = entry3.getKey();
-				cR = entry3.getValue();
-				
-				if (cR.getCosto() < INFINITO) {
-					costo="";
-					costo += cR.getCosto();
-				}
-				else 
-					costo = "Infinito";
-
-				System.out.print("("+ red +", "+ costo +") ");
-			}
-			
-			System.out.println();
-			if (linkAdy.isActivo())
-				routerAdy.recibirTabla(tablaAux, linkAdy);
 		}
 	}
 	
@@ -131,21 +94,32 @@ public class Router {
 			red = entry.getKey(); 
 			costoRuta = entry.getValue(); 
 			
-			if(tablaNueva.containsKey(red)) { //Ya tengo la red, veo si me sirve
-				
-				int costoNuevo = costoRuta.getCosto() + link.getCosto(); 
-				int costoActual = tablaNueva.get(red).getCosto();
-				int idActual = tablaNueva.get(red).getLink().getId();
-				
-				if ((costoNuevo < costoActual) || ((costoNuevo > costoActual) && (link.getId() == idActual))) {
-					CostoRuta cR = new CostoRuta(link,costoNuevo);
-					tablaNueva.put(red, cR); //actualizo el costo de la red
-				}
-				
-			}else { //No tenia como llegar a esa red, la agrego
-				this.addRuta(red, link, costoRuta.getCosto());
+			if (link.getId() == costoRuta.getLink().getId()) {
+				System.out.print("("+ red +", Infinito) ");
 			}
-		}		
+			else {
+				if (costoRuta.getCosto()< INFINITO)
+					System.out.print("("+ red +", "+ costoRuta.getCosto() +") ");
+				else
+					System.out.print("("+ red +", Infinito) ");
+				
+				if(tablaNueva.containsKey(red)) { //Ya tengo la red, veo si me sirve
+					
+					int costoNuevo = costoRuta.getCosto() + link.getCosto(); 
+					int costoActual = tablaNueva.get(red).getCosto();
+					int idActual = tablaNueva.get(red).getLink().getId();
+					
+					if ((costoNuevo < costoActual) || ((costoNuevo > costoActual) && (link.getId() == idActual))) {
+						CostoRuta cR = new CostoRuta(link,costoNuevo);
+						tablaNueva.put(red, cR); //actualizo el costo de la red
+					}
+					
+				}else { //No tenia como llegar a esa red, la agrego
+					this.addRuta(red, link, costoRuta.getCosto());
+				}
+			}
+		}	
+		System.out.println();
 	}	
 			
 	public boolean actualizarTabla() {
@@ -214,12 +188,9 @@ public class Router {
 			idLink = l.getId();
 			
 			if(idLink == idLinkCaido) {
-				l.deshabilitarLink();
-				adyacentes.remove(r);
-				adyacentes.put(r,l);
+				entry.getValue().deshabilitarLink();;
 			}
 		}
-		
 		intercambiarRutas(tablaint);
 		
 	}
