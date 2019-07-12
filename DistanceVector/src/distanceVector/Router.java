@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Router {
 	
-	static final int INFINITO = 8; 
+	static final int INFINITO = 88; 
 
 	int id;
 	HashMap<String, CostoRuta> tabla;//tabla de ruteo que contiene los valores utilizados en el intercambio
@@ -74,12 +74,21 @@ public class Router {
 		CostoRuta cR;
 		String red;
 		String costo;
+		HashMap<String,CostoRuta> tablaAux = new HashMap<String,CostoRuta>();
 		
 		for ( Entry<Router, Link> entry : adyacentes.entrySet() ){
 			routerAdy = entry.getKey(); 
-			linkAdy = adyacentes.get(routerAdy);
+			linkAdy = entry.getValue();
 			
-			 for ( Entry<String,CostoRuta> entry2 : tablaint.entrySet() ){
+			//copio contenido de la tabla de intercambio para poder modificarlo acorde a 
+			for ( Entry<String,CostoRuta> entry4 : tablaint.entrySet() ){
+				red = entry4.getKey();
+				linkTabla = new Link(entry4.getValue().getLink());
+				cR = new CostoRuta(linkTabla, entry4.getValue().getCosto());
+				tablaAux.put(red, cR);
+			}
+			
+			for ( Entry<String,CostoRuta> entry2 : tablaAux.entrySet() ){
 				
 				linkTabla = entry2.getValue().getLink();
 				/*si el link que me conecta con el router adyacente 
@@ -92,7 +101,7 @@ public class Router {
 		
 			//imprimo mensajes
 			System.out.print("Router "+id +"->Router "+routerAdy.getId()+"(L"+linkAdy.getId()+"): ");
-			for ( Entry<String,CostoRuta> entry3 : tablaint.entrySet() ){
+			for ( Entry<String,CostoRuta> entry3 : tablaAux.entrySet() ){
 				red = entry3.getKey();
 				cR = entry3.getValue();
 				
@@ -105,9 +114,10 @@ public class Router {
 
 				System.out.print("("+ red +", "+ costo +") ");
 			}
+			
 			System.out.println();
 			if (linkAdy.isActivo())
-				routerAdy.recibirTabla(tablaint, linkAdy);
+				routerAdy.recibirTabla(tablaAux, linkAdy);
 		}
 	}
 	
