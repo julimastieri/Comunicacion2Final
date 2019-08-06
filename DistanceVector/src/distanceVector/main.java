@@ -324,7 +324,7 @@ public class main {
 			System.out.println("No se cae ningun link");
 	}
 	
-	private static void caidaLink(int idLink, int tiempoCaida) {
+	private static void caidaLink(int idLink, int tiempoCaida) { //Trigger update
 		Router r;
 		
 		System.out.println("Cae el link: " + idLink + " en el tiempo " + tiempoCaida +"\n");

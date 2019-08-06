@@ -188,7 +188,7 @@ public class Router {
 			idLink = l.getId();
 			
 			if(idLink == idLinkCaido) {
-				entry.getValue().deshabilitarLink();;
+				l.deshabilitarLink(); //entry.getValue();
 			}
 		}
 		intercambiarRutas(tablaint);
